@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 void signal_handler(int sig);
