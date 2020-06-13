@@ -45,7 +45,7 @@ int main() {
 		if(pthread_create(&tid, NULL, &send_recv_thread, (void*)accept_sock) != 0) {
 			perror("pthread_create");
 		}
-		pthread_detach(&tid);
+		pthread_detach(tid);
 	}
 }
 
