@@ -1,0 +1,2 @@
+# class_networkcomputing2
+ネットワークコンピューティングの授業で作ったソースコード
