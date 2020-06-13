@@ -32,22 +32,28 @@ int main() {
 		perror("bind");
 		return 0;
 	}
-	if((listen_sock = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+	if(listen_sock < 0) {
 		perror("socket");
 		exit(1);
 	}
+	listen(listen_sock, 5);
 
 	printf("Ready to Start\n");
 	while(1) {
+		sin_siz		= sizeof(clt);
 		accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
-		pid			= fork();
+		if(accept_sock == -1) {
+			perror("accept");
+		}
+		pid = fork();
 		if(pid < 0) {
 			perror("fork");
 			exit(1);
 		} else if(pid == 0) {
 			close(listen_sock);
 			write(accept_sock, "Hello\n", 7);
-			printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
+			//printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
+			close(accept_sock);
 			exit(0);
 		}
 		close(accept_sock);
