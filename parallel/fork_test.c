@@ -47,6 +47,7 @@ int main() {
 		} else if(pid == 0) {
 			close(listen_sock);
 			write(accept_sock, "Hello\n", 7);
+			printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
 			exit(0);
 		}
 		close(accept_sock);
