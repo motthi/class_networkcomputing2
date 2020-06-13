@@ -42,6 +42,7 @@ int main() {
 	while(1) {
 		sin_siz		= sizeof(clt);
 		accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
+		printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
 		if(pthread_create(&tid, NULL, &send_recv_thread, (void*)accept_sock) != 0) {
 			perror("pthread_create");
 		}
@@ -53,10 +54,7 @@ void* send_recv_thread(void* arg) {
 	pthread_detach(pthread_self());
 	int sock;
 	sock = (int)arg;
-	for(;;) {
-		write(sock, "Hello\n", 7);
-		//printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
-	}
+	write(sock, "Hello\n", 7);
 	close(sock);
 	pthread_exit((void*)0);
 	return (NULL);
