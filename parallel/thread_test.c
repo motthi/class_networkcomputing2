@@ -13,11 +13,10 @@
 void* send_recv_thread(void* arg);
 
 int main() {
-	int listen_sock, accept_sock, pid;
+	int listen_sock, accept_sock;
 	socklen_t sin_siz;
 	struct sockaddr_in addr;
-	struct sockaddr_in serv, clt;
-	unsigned short port;
+	struct sockaddr_in clt;
 	int yes = 1;
 	pthread_t tid;
 
@@ -46,6 +45,7 @@ int main() {
 		if(pthread_create(&tid, NULL, &send_recv_thread, (void*)accept_sock) != 0) {
 			perror("pthread_create");
 		}
+		pthread_detach(&tid);
 	}
 }
 
