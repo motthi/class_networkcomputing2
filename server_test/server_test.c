@@ -29,7 +29,6 @@ int main() {
 	printf("Ready to Start\n");
 	while(1) {
 		len = sizeof(client);
-		printf("%d\n", len);
 		cli = accept(sock, (struct sockaddr*)&client, &len);		//クライアントから受信
 		if(cli == -1) {
 			printf("\nError: could not Accept\n");

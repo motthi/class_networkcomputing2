@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void signal_handler(int sig);
+void* send_recv_thread(void* arg);
 
 int main() {
 	int listen_sock, accept_sock, pid;
@@ -18,9 +19,9 @@ int main() {
 	struct sockaddr_in serv, clt;
 	unsigned short port;
 	int yes = 1;
+	pthread_t tid;
 
 	printf("Now Setting...\n");
-	signal(SIGCHLD, signal_handler);
 
 	listen_sock			 = socket(AF_INET, SOCK_STREAM, 0);
 	addr.sin_family		 = AF_INET;
@@ -42,30 +43,21 @@ int main() {
 	while(1) {
 		sin_siz		= sizeof(clt);
 		accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
-		if(accept_sock == -1) {
-			/* 受信エラー */
-			perror("accept");
+		if(pthread_create(&tid, NULL, &send_recv_thread, (void*)accept_sock) != 0) {
+			perror("pthread_create");
 		}
-		pid = fork();		 //プロセス開始
-		if(pid < 0) {
-			/* エラー発生 */
-			perror("fork");
-			exit(1);
-		} else if(pid == 0) {
-			close(listen_sock);
-			write(accept_sock, "Hello\n", 7);
-			printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
-			close(accept_sock);
-			exit(0);
-		}
-		close(accept_sock);
 	}
 }
 
-void signal_handler(int sig) {
-	int status, retval;
-	do {
-		retval = waitpid(-1, &status, WNOHANG);
-	} while(retval > 0);
-	signal(SIGCHLD, signal_handler);
+void* send_recv_thread(void* arg) {
+	pthread_detach(pthread_self());
+	int sock;
+	sock = (int)arg;
+	for(;;) {
+		write(sock, "Hello\n", 7);
+		//printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
+	}
+	close(sock);
+	pthread_exit((void*)0);
+	return (NULL);
 }
