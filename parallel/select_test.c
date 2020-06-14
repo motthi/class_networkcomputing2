@@ -24,6 +24,7 @@ int main() {
 	int maxfd;				  // ディスクリプタの最大値
 	fd_set rfds;			  // 接続待ち、受信待ちをするディスクリプタの集合
 	struct timeval tv;		  // タイムアウト時間
+	int yes = 1;
 
 	printf("Now Setting...\n");
 	// 受信バッファを初期化する
@@ -41,7 +42,8 @@ int main() {
 	addr.sin_family		 = AF_INET;
 	addr.sin_port		 = ntohs(22629);
 	addr.sin_addr.s_addr = INADDR_ANY;
-	// バインドする
+
+	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		 //TIME_WAIT状態でも再起動可能に設定
 	if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		fprintf(stdout, "bind error\n");
 		return -1;
