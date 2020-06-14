@@ -15,8 +15,7 @@ int main() {
 	int listen_sock, accept_sock, pid;
 	socklen_t sin_siz;
 	struct sockaddr_in addr;
-	struct sockaddr_in serv, clt;
-	unsigned short port;
+	struct sockaddr_in clt;
 	int yes = 1;
 	char inbuf[2048];
 	char obuf[2048];
@@ -40,6 +39,10 @@ int main() {
 	}
 	listen(listen_sock, 5);
 
+	/* HTTPメッセージ作成 */
+	memset(obuf, 0, sizeof(obuf));
+	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HELLO</h1></font>\r\n");
+
 	printf("Ready to Start\n");
 	while(1) {
 		sin_siz		= sizeof(clt);
@@ -57,12 +60,6 @@ int main() {
 			recv(accept_sock, inbuf, sizeof(inbuf), 0);
 			printf("%s", inbuf);
 
-			memset(&obuf, 0, sizeof(obuf));
-			snprintf(&obuf, 0, sizeof(obuf),
-					 "HTTP/1.0 200 OK\r\n"
-					 "Content-Type: text/html\n"
-					 "\r\n"
-					 "<font color=red><h1>HELLO</h1></font>\r\n");
 			send(accept_sock, obuf, (int)strlen(obuf), 0);
 			//printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
 			close(accept_sock);
