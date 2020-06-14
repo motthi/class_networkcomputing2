@@ -109,7 +109,7 @@ int main() {
 					cnt = recv(fd2[i], buf, sizeof(buf), 0);
 					if(cnt > 0) {
 						// パケット受信成功の場合
-						fprintf(stdout, "recv:\"%s\"\n", buf);
+						fprintf(stdout, "recv:\"%s\n", buf);
 						printf("%s", inbuf);
 						send(fd2[i], obuf, (int)strlen(obuf), 0);
 					} else if(cnt == 0) {		 // 切断された場合、クローズする
