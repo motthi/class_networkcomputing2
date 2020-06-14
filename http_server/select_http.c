@@ -111,7 +111,7 @@ int main() {
 						// パケット受信成功の場合
 						fprintf(stdout, "recv:\"%s\"\n", buf);
 						printf("%s", inbuf);
-						send(listen_sock, obuf, (int)strlen(obuf), 0);
+						send(fd2[i], obuf, (int)strlen(obuf), 0);
 					} else if(cnt == 0) {		 // 切断された場合、クローズする
 						fprintf(stdout, "socket:%d  disconnected. \n", fd2[i]);
 						close(fd2[i]);
