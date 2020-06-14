@@ -42,13 +42,11 @@ int main() {
 	while(1) {
 		sin_siz		= sizeof(clt);
 		accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
-		if(accept_sock == -1) {
-			/* 受信エラー */
+		if(accept_sock == -1) {		   // 受信エラー
 			perror("accept");
 		}
 		pid = fork();		 //プロセス開始
-		if(pid < 0) {
-			/* エラー発生 */
+		if(pid < 0) {		 // エラー発生
 			perror("fork");
 			exit(1);
 		} else if(pid == 0) {
