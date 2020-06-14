@@ -36,7 +36,7 @@ int main() {
 	addr.sin_family		 = AF_INET;
 	addr.sin_port		 = ntohs(22629);
 	addr.sin_addr.s_addr = INADDR_ANY;
-	if(fd < -) {
+	if(fd < 0) {
 		perror("socket");
 		return -1;
 	}
