@@ -110,8 +110,6 @@ int main() {
 					if(cnt > 0) {
 						// パケット受信成功の場合
 						fprintf(stdout, "recv:\"%s\"\n", buf);
-						memset(inbuf, 0, sizeof(inbuf));
-						recv(listen_sock, inbuf, sizeof(inbuf), 0);
 						printf("%s", inbuf);
 						send(listen_sock, obuf, (int)strlen(obuf), 0);
 					} else if(cnt == 0) {		 // 切断された場合、クローズする
