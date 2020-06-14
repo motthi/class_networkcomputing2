@@ -52,6 +52,7 @@ int main() {
 			sin_siz		= sizeof(clt);
 			accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
 			printf("accepted connection from %s, port=%d\n", inet_ntoa(clt.sin_addr), ntohs(clt.sin_port));
+			write(sock, "Hello\n", 7);
 			close(accept_sock);
 		}
 		/* for(int i = 0; i < maxfd + 1; i++) {
