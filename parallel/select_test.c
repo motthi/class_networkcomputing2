@@ -27,35 +27,31 @@ int main() {
 	int yes = 1;
 
 	printf("Now Setting...\n");
-	// 受信バッファを初期化する
-	memset(buf, 0, sizeof(buf));
-	// 通信用ディスクリプタの配列を初期化する
-	for(int i = 0; i < sizeof(fd2) / sizeof(fd2[0]); i++) {
+	memset(buf, 0, sizeof(buf));								   // 受信バッファを初期化する
+	for(int i = 0; i < sizeof(fd2) / sizeof(fd2[0]); i++) {		   // 通信用ディスクリプタの配列を初期化する
 		fd2[i] = -1;
 	}
-	// ソケットを作成する
-	if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		fprintf(stdout, "socket error : fd = %d\n", fd);
-		return -1;
-	}
 
+	fd					 = socket(AF_INET, SOCK_STREAM, 0);
 	addr.sin_family		 = AF_INET;
 	addr.sin_port		 = ntohs(22629);
 	addr.sin_addr.s_addr = INADDR_ANY;
+	if(fd < -) {
+		perror("socket");
+		return -1;
+	}
 
 	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		 //TIME_WAIT状態でも再起動可能に設定
 	if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		fprintf(stdout, "bind error\n");
+		perror("bind");
 		return -1;
 	}
-	// 接続待ち状態とする。待ちうけるコネクト要求は１個
-	if(listen(fd, 1) < 0) {
-		fprintf(stdout, "listen error\n");
+	if(listen(fd, 1) < 0) {		   // 接続待ち状態とする。待ちうけるコネクト要求は１個
+		perror("listen");
 		return -1;
 	}
 
 	printf("Ready to Start\n");
-
 	while(1) {
 		// 接続待ちのディスクリプタをディスクリプタ集合に設定する
 		FD_ZERO(&rfds);
