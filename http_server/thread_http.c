@@ -1,12 +1,16 @@
-#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
-void signal_handler(int sig);
+void* send_recv_thread(void* arg);
 
 int main() {
 	int listen_sock, accept_sock;
@@ -14,8 +18,8 @@ int main() {
 	struct sockaddr_in addr;
 	struct sockaddr_in clt;
 	int yes = 1;
+	pthread_t tid;
 	char inbuf[2048];
-	char obuf[2048];
 
 	printf("Now Setting...\n");
 
@@ -35,20 +39,31 @@ int main() {
 	}
 	listen(listen_sock, 5);
 
-	/* HTTPメッセージ作成 */
-	memset(obuf, 0, sizeof(obuf));
-	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HELLO</h1></font>\r\n");
-
 	printf("Ready to Start\n");
 	while(1) {
 		sin_siz		= sizeof(clt);
 		accept_sock = accept(listen_sock, (struct sockaddr*)&clt, &sin_siz);
-
 		memset(inbuf, 0, sizeof(inbuf));
 		recv(accept_sock, inbuf, sizeof(inbuf), 0);
 		printf("%s", inbuf);
-
-		send(accept_sock, obuf, (int)strlen(obuf), 0);
-		close(accept_sock);
+		if(pthread_create(&tid, NULL, &send_recv_thread, (void*)accept_sock) != 0) {
+			perror("pthread_create");
+		}
+		pthread_detach(tid);
 	}
+}
+
+void* send_recv_thread(void* arg) {
+	pthread_detach(pthread_self());
+	char obuf[2048];
+	int sock;
+	sock = (int)arg;
+
+	/* HTTPメッセージ作成 */
+	memset(obuf, 0, sizeof(obuf));
+	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HELLO</h1></font>\r\n");
+	send(sock, obuf, (int)strlen(obuf), 0);
+	close(sock);
+	pthread_exit((void*)0);
+	return (NULL);
 }
