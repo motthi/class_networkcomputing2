@@ -41,7 +41,7 @@ int main() {
 
 	/* HTTPメッセージ作成 */
 	memset(obuf, 0, sizeof(obuf));
-	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HTTTP Parallel Server Test</h1><h1>Hello World!</h1></font>\r\n");
+	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HTTP Parallel Server Test</h1><h1>Hello World!</h1></font>\r\n");
 
 	printf("Ready to Start\n");
 	while(1) {
