@@ -24,14 +24,17 @@ int main() {
 		perror("bind");
 		return 0;
 	}
-	listen(sock, 5);		//用意したsocketを待ち受け状態にする（CLOSED->LISTEN)
+	if(listen(sock, 5) == -1) {		   //用意したsocketを待ち受け状態にする（CLOSED->LISTEN)
+		perror("listen");
+		return 0;
+	}
 
 	printf("Ready to Start\n");
 	while(1) {
 		len = sizeof(client);
 		cli = accept(sock, (struct sockaddr*)&client, &len);		//クライアントから受信
 		if(cli == -1) {
-			printf("\nError: could not Accept\n");
+			perror("accept");
 		}
 		printf("accepted connection from %s, port=%d\n", inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 		write(cli, "Hello\n", 7);

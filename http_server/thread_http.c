@@ -61,7 +61,7 @@ void* send_recv_thread(void* arg) {
 
 	/* HTTPメッセージ作成 */
 	memset(obuf, 0, sizeof(obuf));
-	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HELLO</h1></font>\r\n");
+	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HTTTP Parallel Server Test</h1><h1>Hello World!</h1></font>\r\n");
 	send(sock, obuf, (int)strlen(obuf), 0);
 	close(sock);
 	pthread_exit((void*)0);

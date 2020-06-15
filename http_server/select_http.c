@@ -54,7 +54,7 @@ int main() {
 
 	/* HTTPメッセージ作成 */
 	memset(obuf, 0, sizeof(obuf));
-	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HELLO</h1></font>\r\n");
+	snprintf(obuf, sizeof(obuf), "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<font color=red><h1>HTTTP Parallel Server Test</h1><h1>Hello World!</h1></font>\r\n");
 
 	printf("Ready to Start\n");
 	while(1) {
@@ -109,7 +109,7 @@ int main() {
 					cnt = recv(fd2[i], buf, sizeof(buf), 0);
 					if(cnt > 0) {
 						// パケット受信成功の場合
-						fprintf(stdout, "recv:\"%s\n", buf);
+						fprintf(stdout, "recv:%s\"\n", buf);
 						printf("%s", inbuf);
 						send(fd2[i], obuf, (int)strlen(obuf), 0);
 					} else if(cnt == 0) {		 // 切断された場合、クローズする
