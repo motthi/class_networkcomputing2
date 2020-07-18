@@ -15,8 +15,8 @@ void* send_recv_thread(void* arg);
 
 int main() {
 	int epfd, nfd, fd;
-	struct epoll_event* event;
-	struct epoll_event* events;
+	struct epoll_event event;
+	struct epoll_event events;
 	char s[2048];
 
 	epfd = epoll_create(1);
