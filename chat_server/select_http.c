@@ -19,11 +19,34 @@ int main() {
 	struct epoll_event events;
 	char s[2048];
 
+	int listen_sock, accept_sock;
+	socklen_t sin_siz;
+	struct sockaddr_in addr;
+	struct sockaddr_in clt;
+	int yes = 1;
+
+	listen_sock			 = socket(AF_INET, SOCK_STREAM, 0);
+	addr.sin_family		 = AF_INET;
+	addr.sin_port		 = htons(22629);
+	addr.sin_addr.s_addr = INADDR_ANY;
+
+	setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		  //TIME_WAIT状態でも再起動可能に設定
+	if(bind(listen_sock, (struct sockaddr*)&addr, sizeof(addr)) == -1) {					  //通信元の情報を与える
+		perror("bind");
+		return 0;
+	}
+	if(listen_sock < 0) {
+		perror("socket");
+		exit(1);
+	}
+	listen(listen_sock, 5);
+
 	epfd = epoll_create(1);
 	if(epfd < 0) {
 		printf("epoll_create() failed¥n");
 		return -1;
 	}
+
 	memset(&event, 0, sizeof(event));
 	event.events  = EPOLLIN;
 	event.data.fd = 0;
@@ -31,6 +54,8 @@ int main() {
 		printf("epoll_ctl() failed¥n");
 		return -1;
 	}
+
+	printf("Ready to Start\n");
 	while(1) {
 		nfd = epoll_wait(epfd, &events, 1, -1);
 		if(nfd < 0) {
