@@ -18,12 +18,13 @@ int main() {
 	struct epoll_event event;
 	struct epoll_event events;
 	char s[2048];
-
 	int listen_sock, accept_sock;
 	socklen_t sin_siz;
 	struct sockaddr_in addr;
 	struct sockaddr_in clt;
 	int yes = 1;
+
+	printf("Now Setting...\n");
 
 	listen_sock			 = socket(AF_INET, SOCK_STREAM, 0);
 	addr.sin_family		 = AF_INET;
@@ -58,6 +59,7 @@ int main() {
 	printf("Ready to Start\n");
 	while(1) {
 		nfd = epoll_wait(epfd, &events, 1, -1);
+		printf("%d\n", nfd);
 		if(nfd < 0) {
 			printf("epoll_wait() failed¥n");
 		} else if(nfd == 0) {
