@@ -106,10 +106,10 @@ int main(int argc, char* argv[]) {
 					fd_list[num_fd] = connect_d;
 				}
 				num_fd++;
-				/* for(int k = 0; k < num_fd; k++) {
+				for(int k = 0; k < num_fd; k++) {
 					printf("\t%d", fd_list[k]);
 				}
-				printf("\n"); */
+				printf("\n");
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
@@ -134,8 +134,12 @@ int main(int argc, char* argv[]) {
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
 					num_fd--;
+					for(int k = 0; k < num_fd; k++) {
+						printf("\t%d", fd_list[k]);
+					}
+					printf("\n");
+
 				} else {
-					printf("%d\n", fd_count);
 					for(int k = 0; k < num_fd; k++) {
 						write(fd_list[k], buf, strlen(buf));
 					}
