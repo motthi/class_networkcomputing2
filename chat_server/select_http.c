@@ -1,76 +1,115 @@
-#include <arpa/inet.h>
-#include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/epoll.h>
-#include <sys/select.h>
-#include <sys/timeb.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <errno.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/epoll.h>
 
-void* send_recv_thread(void* arg);
+const int MAX_EVENTS = 10;
 
-int main() {
-	int epfd, nfd, fd;
-	struct epoll_event event;
-	struct epoll_event events;
-	struct sockaddr_in addr;
-	struct sockaddr_in clt;
-	char s[2048];
-	int listen_sock, accept_sock;
-	socklen_t sin_siz;
-	int yes = 1;
-	int cnt;
-	char buf[2048];
+void error(char* msg) {
+	fprintf(stderr, "%s:%s\n", msg, strerror(errno));
+	exit(1);
+}
 
-	printf("Now Setting...\n");
-
-	listen_sock			 = socket(AF_INET, SOCK_STREAM, 0);
-	addr.sin_family		 = AF_INET;
-	addr.sin_port		 = htons(22629);
-	addr.sin_addr.s_addr = INADDR_ANY;
-
-	setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		  //TIME_WAIT状態でも再起動可能に設定
-	if(bind(listen_sock, (struct sockaddr*)&addr, sizeof(addr)) == -1) {					  //通信元の情報を与える
-		perror("bind");
-		return 0;
+int read_line(int socket, char* buf, int len) {
+	char* s	 = buf;
+	int slen = len;
+	int c	 = read(socket, s, slen);
+	while((c > 0) && (s[c - 1] != '\n')) {
+		s += c;
+		slen = -c;
+		c	 = read(socket, s, slen);
 	}
-	if(listen_sock < 0) {
-		perror("socket");
-		exit(1);
+	if(c < 0) {
+		return c;
 	}
-	listen(listen_sock, 5);
+	return len - slen;
+}
 
-	epfd = epoll_create(1);
-	if(epfd < 0) {
-		printf("epoll_create() failed¥n");
-		return -1;
+int main(int argc, char* argv[]) {
+	struct sockaddr_in name;
+	struct sockaddr_storage client_addr;
+	struct epoll_event ev;
+	struct epoll_event events[MAX_EVENTS];
+	unsigned int address_size = sizeof(client_addr);
+	char buf[255];
+	int epfd;
+	int listener_d;
+
+	listener_d = socket(PF_INET, SOCK_STREAM, 0);
+	if(listener_d == -1) {
+		error("socket err");
 	}
-
-	memset(&event, 0, sizeof(event));
-	event.events  = EPOLLIN;
-	event.data.fd = 0;
-	if(epoll_ctl(epfd, EPOLL_CTL_ADD, 0, &event) < 0) {
-		printf("epoll_ctl() failed¥n");
-		return -1;
+	name.sin_family		 = AF_INET;
+	name.sin_port		 = htons(22629);
+	name.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(bind(listener_d, (struct sockaddr*)&name, sizeof(name)) == -1) {
+		error("bind err");
 	}
 
-	printf("Ready to Start\n");
+	if(listen(listener_d, 1) == -1) {
+		error("listen err");
+	}
+
+	puts("wait...");
+
+	// epollファイルディスクリプタをオープン
+	if((epfd = epoll_create(100)) < 0) {
+		error("epoll_create err");
+	}
+
+	// listener_dソケットをepollの監視対象とする
+	memset(&ev, 0, sizeof ev);
+	ev.events  = EPOLLIN;
+	ev.data.fd = listener_d;
+	if((epoll_ctl(epfd, EPOLL_CTL_ADD, listener_d, &ev)) < 0) {
+		error("epoll_ctl error");
+	}
+
 	while(1) {
-		nfd = epoll_wait(epfd, &events, 1, -1);
-		printf("%d\n", nfd);
-		if(nfd < 0) {
-			printf("epoll_wait() failed¥n");
-		} else if(nfd == 0) {
-			printf("epoll_wait() timeout¥n");
-		} else if(nfd) {
-			cnt = recv(listen_sock, buf, sizeof(buf), 0);
-			read(fd, s, sizeof(s));
-			printf("%s", s);
-			memset(&s, 0, sizeof(s));
+		int fd_count = epoll_wait(epfd, events, MAX_EVENTS, -1);
+
+		// 準備ができたディスクリプタを順番に処理
+		int i;
+		for(i = 0; i < fd_count; i++) {
+			if(events[i].data.fd == listener_d) {
+				// 準備ができたディスクリプタがlistener_dということは
+				// 新しいクライアントが接続してきたということ
+				int connect_d = accept(listener_d, (struct sockaddr*)&client_addr, &address_size);
+				if(connect_d == -1) {
+					error("accept err");
+				}
+
+				printf("Client Connected\n");
+				char* msg = "Hello World!\r\n";
+				write(connect_d, msg, strlen(msg));
+
+				// connect_dソケットを監視対象とする
+				memset(&ev, 0, sizeof ev);
+				ev.events  = EPOLLIN;
+				ev.data.fd = connect_d;
+				if((epoll_ctl(epfd, EPOLL_CTL_ADD, connect_d, &ev)) < 0) {
+					error("epoll_ctl error");
+				}
+			} else {
+				// connect_dの準備ができたということは
+				// クライアントからのデータが届いたということ
+				int connect_d = events[i].data.fd;
+
+				read_line(connect_d, buf, sizeof(buf));
+
+				write(connect_d, buf, strlen(buf));
+				printf("%d\t%s\n", conncet_d, buf);
+
+				close(connect_d);
+
+				// closeしたソケットを監視対象から削除
+				epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
+			}
 		}
 	}
+	return 0;
 }
