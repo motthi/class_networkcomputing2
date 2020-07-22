@@ -9,25 +9,8 @@
 
 const int MAX_EVENTS = 10;
 
-void error(char* msg) {
-	fprintf(stderr, "%s:%s\n", msg, strerror(errno));
-	exit(1);
-}
-
-int read_line(int socket, char* buf, int len) {
-	char* s	 = buf;
-	int slen = len;
-	int c	 = read(socket, s, slen);
-	while((c > 0) && (s[c - 1] != '\n')) {
-		s += c;
-		slen = -c;
-		c	 = read(socket, s, slen);
-	}
-	if(c < 0) {
-		return c;
-	}
-	return len - slen;
-}
+void error(char* msg);
+int read_line(int socket, char* buf, int len);
 
 int main(int argc, char* argv[]) {
 	struct sockaddr_in name;
@@ -121,6 +104,7 @@ int main(int argc, char* argv[]) {
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
+					/* 切断するクライアント以外をコピー */
 					int* fd_buf	   = (int*)malloc(sizeof(int) * num_fd - 1);
 					int fd_buf_num = 0;
 					for(int k = 0; k < num_fd; k++) {
@@ -129,27 +113,43 @@ int main(int argc, char* argv[]) {
 							fd_buf_num++;
 						}
 					}
-					for(int k = 0; k < num_fd; k++) {
-						printf("\t%d", fd_buf[k]);
-					}
-					printf("\n");
 					free(fd_list);
+
+					/* クライアントのリストを更新 */
 					fd_list = (int*)malloc(sizeof(int) * (fd_buf_num));
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
 					num_fd--;
-					for(int k = 0; k < num_fd; k++) {
-						printf("\t%d", fd_list[k]);
-					}
-					printf("\n");
-
 				} else {
+					sprintf(buf, "%d: %s", connect_d, buf);
 					for(int k = 0; k < num_fd; k++) {
-						write(fd_list[k], buf, strlen(buf));
+						if(fd_list[k] == connect_d) {
+							write(fd_list[k], buf, strlen(buf));
+						}
 					}
 				}
 			}
 		}
 	}
 	return 0;
+}
+
+void error(char* msg) {
+	fprintf(stderr, "%s:%s\n", msg, strerror(errno));
+	exit(1);
+}
+
+int read_line(int socket, char* buf, int len) {
+	char* s	 = buf;
+	int slen = len;
+	int c	 = read(socket, s, slen);
+	while((c > 0) && (s[c - 1] != '\n')) {
+		s += c;
+		slen = -c;
+		c	 = read(socket, s, slen);
+	}
+	if(c < 0) {
+		return c;
+	}
+	return len - slen;
 }
