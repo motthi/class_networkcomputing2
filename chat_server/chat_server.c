@@ -36,8 +36,7 @@ int main(int argc, char* argv[]) {
 	struct epoll_event events[MAX_EVENTS];
 	unsigned int address_size = sizeof(client_addr);
 	char buf[255];
-	int epfd;
-	int listener_d;
+	int epfd, listener_d;
 
 	listener_d = socket(PF_INET, SOCK_STREAM, 0);
 	if(listener_d == -1) {
@@ -85,7 +84,6 @@ int main(int argc, char* argv[]) {
 				char* msg = "Welcome!\r\n";
 				write(connect_d, msg, strlen(msg));
 
-				// connect_dソケットを監視対象とする
 				memset(&ev, 0, sizeof ev);
 				ev.events  = EPOLLIN;
 				ev.data.fd = connect_d;
@@ -102,16 +100,8 @@ int main(int argc, char* argv[]) {
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 				} else {
-					for(int j = 0; j < fd_count; j++) {
-						if(j != i) {
-							int connect_j = events[j].data.fd;
-							if(connect_j == -1) {
-								continue;
-							}
-							printf("%d\n", connect_j);
-							write(connect_j, buf, strlen(buf));
-						}
-					}
+					printf("%d\n", fd_count);
+					write(connect_d, buf, strlen(buf));
 				}
 			}
 		}
