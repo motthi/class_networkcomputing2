@@ -17,11 +17,11 @@ int main() {
 	int epfd, nfd, fd;
 	struct epoll_event event;
 	struct epoll_event events;
+	struct sockaddr_in addr;
+	struct sockaddr_in clt;
 	char s[2048];
 	int listen_sock, accept_sock;
 	socklen_t sin_siz;
-	struct sockaddr_in addr;
-	struct sockaddr_in clt;
 	int yes = 1;
 	int cnt;
 	char buf[2048];
