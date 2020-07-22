@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 				printf("%d\t%s\n", connect_d, buf);
 
 				printf("strcmp:%d\n", strncmp(buf, ":q", 2));
-				if(strncmp(buf, ":q") == 0) {		 //終了コマンド
+				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					printf("close\n");
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
