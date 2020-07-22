@@ -121,9 +121,9 @@ int main(int argc, char* argv[]) {
 					free(fd_buf);
 					num_fd--;
 				} else {
-					sprintf(buf, "%d: %s", connect_d, buf);
+					sprintf(buf, "%d: %s\r\n", connect_d, buf);
 					for(int k = 0; k < num_fd; k++) {
-						if(fd_list[k] == connect_d) {
+						if(fd_list[k] != connect_d) {
 							write(fd_list[k], buf, strlen(buf));
 						}
 					}
