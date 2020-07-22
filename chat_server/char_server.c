@@ -97,11 +97,12 @@ int main(int argc, char* argv[]) {
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
+				printf("%d : %s", connect_d, buf);
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					printf("close\n");
 					close(connect_d);
-					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
+					epoll_ctl(epfdf, EPOLL_CTL_DEL, connect_d, &ev);
 				} else {
 					for(int j = 0; j < fd_count; j++) {
 						if(j != i) {
