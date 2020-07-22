@@ -89,9 +89,6 @@ int main(int argc, char* argv[]) {
 					fd_list[num_fd] = connect_d;
 				}
 				num_fd++;
-				for(int k = 0; k < num_fd; k++) {
-					printf("\t%d", fd_list[k]);
-				}
 				printf("\n");
 			} else {
 				int connect_d = events[i].data.fd;
@@ -121,10 +118,11 @@ int main(int argc, char* argv[]) {
 					free(fd_buf);
 					num_fd--;
 				} else {
-					sprintf(buf, "%d: %s\r\n", connect_d, buf);
+					char writeData[255];
+					sprintf(writeData, "%d: %s\r\n", connect_d, buf);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
-							write(fd_list[k], buf, strlen(buf));
+							write(fd_list[k], writeData, strlen(buf));
 						}
 					}
 				}
