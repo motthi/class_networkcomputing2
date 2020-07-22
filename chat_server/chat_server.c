@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 					int fd_buf_num = 0;
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
-							memcpy(*(fd_buf + fd_buf_num), *(fd_list + k), sizeof(fd_buf));
+							fd_buf[fd_buf_num] = fd_list[k]
 						}
 						fd_buf_num++;
 					}
