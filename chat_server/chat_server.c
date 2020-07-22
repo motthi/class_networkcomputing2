@@ -101,7 +101,9 @@ int main(int argc, char* argv[]) {
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 				} else {
 					printf("%d\n", fd_count);
-					write(connect_d, buf, strlen(buf));
+					//write(connect_d, buf, strlen(buf));
+					write(5, buf, strlen(buf));
+					write(6, buf, strlen(buf));
 				}
 			}
 		}
