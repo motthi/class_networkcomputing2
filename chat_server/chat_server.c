@@ -126,12 +126,13 @@ int main(int argc, char* argv[]) {
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
 							fd_buf[fd_buf_num] = fd_list[k];
+							fd_buf_num++;
 						}
-						fd_buf_num++;
 					}
 					for(int k = 0; k < num_fd; k++) {
 						printf("\t%d", fd_buf[k]);
 					}
+					printf("\n");
 					free(fd_list);
 					fd_list = (int*)malloc(sizeof(int) * (fd_buf_num));
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
