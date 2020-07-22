@@ -104,7 +104,9 @@ int main(int argc, char* argv[]) {
 				write(connect_d, buf, strlen(buf));
 				printf("%d\t%s\n", connect_d, buf);
 
-				close(connect_d);
+				if(buf == ":q") {
+					close(connect_d);
+				}
 
 				// closeしたソケットを監視対象から削除
 				epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
