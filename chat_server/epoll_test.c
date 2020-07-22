@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 
 	struct sockaddr_in name;
 	name.sin_family		 = AF_INET;
-	name.sin_port		 = (in_port_t)htons(30000);
+	addr.sin_port		 = htons(22629);
 	name.sin_addr.s_addr = htonl(INADDR_ANY);
 	if(bind(listener_d, (struct sockaddr*)&name, sizeof(name)) == -1) {
 		error("bind err");
