@@ -23,6 +23,8 @@ int main() {
 	struct sockaddr_in addr;
 	struct sockaddr_in clt;
 	int yes = 1;
+	int cnt;
+	char buf[2048];
 
 	printf("Now Setting...\n");
 
@@ -65,6 +67,7 @@ int main() {
 		} else if(nfd == 0) {
 			printf("epoll_wait() timeout¥n");
 		} else if(nfd) {
+			cnt = recv(listen_sock, buf, sizeof(buf), 0);
 			read(fd, s, sizeof(s));
 			printf("%s", s);
 			memset(&s, 0, sizeof(s));
