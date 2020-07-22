@@ -76,15 +76,13 @@ int main(int argc, char* argv[]) {
 		int i;
 		for(i = 0; i < fd_count; i++) {
 			if(events[i].data.fd == listener_d) {
-				// 準備ができたディスクリプタがlistener_dということは
-				// 新しいクライアントが接続してきたということ
 				int connect_d = accept(listener_d, (struct sockaddr*)&client_addr, &address_size);
 				if(connect_d == -1) {
 					error("accept err");
 				}
 
 				printf("Client Connected\n");
-				char* msg = "Hello World!\r\n";
+				char* msg = "Welcome!\r\n";
 				write(connect_d, msg, strlen(msg));
 
 				// connect_dソケットを監視対象とする
@@ -107,6 +105,10 @@ int main(int argc, char* argv[]) {
 					for(int j = 0; j < fd_count; j++) {
 						if(j != i) {
 							int connect_j = events[j].data.fd;
+							if(connect_j == -1) {
+								continue;
+							}
+							printf("%d\n", connect_j);
 							write(connect_j, buf, strlen(buf));
 						}
 					}
