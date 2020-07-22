@@ -37,6 +37,8 @@ int main(int argc, char* argv[]) {
 	unsigned int address_size = sizeof(client_addr);
 	char buf[255];
 	int epfd, listener_d;
+	int num_fd = 0;
+	int* fd_list;
 
 	listener_d = socket(PF_INET, SOCK_STREAM, 0);
 	if(listener_d == -1) {
@@ -53,8 +55,6 @@ int main(int argc, char* argv[]) {
 		error("listen err");
 	}
 
-	puts("wait...");
-
 	// epollファイルディスクリプタをオープン
 	if((epfd = epoll_create(100)) < 0) {
 		error("epoll_create err");
@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) {
 		error("epoll_ctl error");
 	}
 
+	printf("Ready ...\n");
 	while(1) {
 		int fd_count = epoll_wait(epfd, events, MAX_EVENTS, -1);
 
@@ -90,6 +91,23 @@ int main(int argc, char* argv[]) {
 				if((epoll_ctl(epfd, EPOLL_CTL_ADD, connect_d, &ev)) < 0) {
 					error("epoll_ctl error");
 				}
+				if(num_fd == 0) {
+					fd_list	   = (int*)malloc(sizeof(int));
+					fd_list[0] = connect_d;
+				} else {
+					int* fd_buf = (int*)malloc(sizeof(int) * num_fd);
+					memcpy(fd_buf, fd_list, sizeof(fd_buf));
+					free(fd_list);
+					fd_list = (int*)malloc(sizeof(int) * (num_fd + 1));
+					memcpy(fd_list, fd_buf, sizeof(fd_buf));
+					free(fd_buf);
+					fd_list[num_fd] = connect_d;
+				}
+				num_fd++;
+				for(int k = 0; k < num_fd; k++) {
+					printf("\t%d", fd_list[k]);
+				}
+				printf("\n");
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
@@ -99,11 +117,12 @@ int main(int argc, char* argv[]) {
 					printf("close\n");
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
+					num_fd--;
 				} else {
 					printf("%d\n", fd_count);
-					//write(connect_d, buf, strlen(buf));
-					write(5, buf, strlen(buf));
-					write(6, buf, strlen(buf));
+					for(int k = 0; k < num_fd; k++) {
+						write(fd_list[k], buf, strlen(buf));
+					}
 				}
 			}
 		}
