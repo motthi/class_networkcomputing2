@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 				read_line(connect_d, buf, sizeof(buf));
 
 				write(connect_d, buf, strlen(buf));
-				printf("%d\t%s\n", conncet_d, buf);
+				printf("%d\t%s\n", connect_d, buf);
 
 				close(connect_d);
 
