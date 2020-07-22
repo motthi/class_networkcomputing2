@@ -121,13 +121,16 @@ int main(int argc, char* argv[]) {
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
-					int* fd_buf	   = (int*)malloc(sizeof(int) * num_fd);
+					int* fd_buf	   = (int*)malloc(sizeof(int) * num_fd - 1);
 					int fd_buf_num = 0;
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
 							fd_buf[fd_buf_num] = fd_list[k];
 						}
 						fd_buf_num++;
+					}
+					for(int k = 0; k < num_fd; k++) {
+						printf("\t%d", fd_buf[k]);
 					}
 					free(fd_list);
 					fd_list = (int*)malloc(sizeof(int) * (fd_buf_num));
