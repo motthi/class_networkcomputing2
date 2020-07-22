@@ -101,8 +101,8 @@ int main(int argc, char* argv[]) {
 				write(connect_d, buf, strlen(buf));
 				printf("%d\t%s\n", connect_d, buf);
 
-				printf("strcmp:%d\n", strcmp(buf, ":q"));
-				if(strcmp(buf, ":q") == 0) {		//終了コマンド
+				printf("strcmp:%d\n", strncmp(buf, ":q", 2));
+				if(strncmp(buf, ":q") == 0) {		 //終了コマンド
 					printf("close\n");
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
