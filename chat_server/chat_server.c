@@ -93,11 +93,10 @@ int main(int argc, char* argv[]) {
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
-				printf("%d : %s", connect_d, buf);
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					/* クライアントを切断する */
-					printf("close\n");
+					printf("%d: closed\n", connect_d);
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
@@ -122,7 +121,7 @@ int main(int argc, char* argv[]) {
 					sprintf(writeData, "%d: %s\r\n", connect_d, buf);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
-							write(fd_list[k], writeData, strlen(buf));
+							write(fd_list[k], writeData, strlen(writeData));
 						}
 					}
 				}
