@@ -105,7 +105,8 @@ int main(int argc, char* argv[]) {
 				} else {
 					for(int j = 0; j < fd_count; j++) {
 						if(j != i) {
-							write(buf, strlen(buf));
+							int connect_j = events[j].data.fd;
+							write(connect_j, buf, strlen(buf));
 						}
 					}
 				}
