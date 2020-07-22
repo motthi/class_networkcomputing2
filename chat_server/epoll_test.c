@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
 					error("accept err");
 				}
 
+				printf("Client Connected\n");
 				char* msg = "Hello World!\r\n";
 				write(connect_d, msg, strlen(msg));
 
