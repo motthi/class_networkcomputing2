@@ -91,6 +91,8 @@ int main(int argc, char* argv[]) {
 				if((epoll_ctl(epfd, EPOLL_CTL_ADD, connect_d, &ev)) < 0) {
 					error("epoll_ctl error");
 				}
+
+				/* 新しくチャットに入ったクライアントの番号を配列として保存する */
 				if(num_fd == 0) {
 					fd_list	   = (int*)malloc(sizeof(int));
 					fd_list[0] = connect_d;
@@ -104,19 +106,33 @@ int main(int argc, char* argv[]) {
 					fd_list[num_fd] = connect_d;
 				}
 				num_fd++;
-				for(int k = 0; k < num_fd; k++) {
+				/* for(int k = 0; k < num_fd; k++) {
 					printf("\t%d", fd_list[k]);
 				}
-				printf("\n");
+				printf("\n"); */
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
 				printf("%d : %s", connect_d, buf);
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
+					/* クライアントを切断する */
 					printf("close\n");
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
+
+					int* fd_buf	   = (int*)malloc(sizeof(int) * num_fd);
+					int fd_buf_num = 0;
+					for(int k = 0; k < num_fd; k++) {
+						if(fd_list[k] != connect_d) {
+							memcpy(*(fd_buf + fd_buf_num), *(fd_list + k), sizeof(fd_buf));
+						}
+						fd_buf_num++;
+					}
+					free(fd_list);
+					fd_list = (int*)malloc(sizeof(int) * (fd_buf_num));
+					memcpy(fd_list, fd_buf, sizeof(fd_buf));
+					free(fd_buf);
 					num_fd--;
 				} else {
 					printf("%d\n", fd_count);
