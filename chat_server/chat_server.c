@@ -93,6 +93,7 @@ int main(int argc, char* argv[]) {
 			} else {
 				int connect_d = events[i].data.fd;
 				read_line(connect_d, buf, sizeof(buf));
+				printf("%s", buf);
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					/* クライアントを切断する */
