@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 				} else {
 					char writeData[255];
 					sprintf(writeData, "%d: %s", connect_d, buf);
-					printf("aaa\t %s", buf);
+					printf("aaa\t %sbbb", buf);
 					//printf("%s", writeData);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
@@ -128,7 +128,6 @@ int main(int argc, char* argv[]) {
 						}
 					}
 					strcpy(buf, "");
-					printf("bbb\t %s", buf);
 				}
 			}
 		}
