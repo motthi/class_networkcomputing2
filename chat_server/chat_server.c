@@ -119,7 +119,8 @@ int main(int argc, char* argv[]) {
 				} else {
 					char writeData[255];
 					sprintf(writeData, "%d: %s", connect_d, buf);
-					printf("%s", writeData);
+					printf("aaa\t %s", buf);
+					//printf("%s", writeData);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
 							write(fd_list[k], writeData, strlen(writeData));
