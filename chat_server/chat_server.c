@@ -126,7 +126,6 @@ int main(int argc, char* argv[]) {
 							write(fd_list[k], writeData, strlen(writeData));
 						}
 					}
-					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 				}
 			}
 		}
