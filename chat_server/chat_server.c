@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 				printf("\n");
 			} else {
 				int connect_d = events[i].data.fd;
-				read_line(connect_d, buf, sizeof(buf));
+				read(connect_d, buf, sizeof(buf));
 				printf("ccc\t %s\tbuf finesh", buf);
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
