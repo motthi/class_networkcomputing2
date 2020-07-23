@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
 	struct epoll_event ev;
 	struct epoll_event events[MAX_EVENTS];
 	unsigned int address_size = sizeof(client_addr);
-	char buf[255];
 	int epfd, listener_d;
 	int num_fd = 0;
 	int* fd_list;
@@ -54,6 +53,7 @@ int main(int argc, char* argv[]) {
 	printf("Ready ...\n");
 	while(1) {
 		int fd_count = epoll_wait(epfd, events, MAX_EVENTS, -1);
+		char buf[255];
 
 		// 準備ができたディスクリプタを順番に処理
 		int i;
