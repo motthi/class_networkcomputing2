@@ -126,6 +126,7 @@ int main(int argc, char* argv[]) {
 							write(fd_list[k], writeData, strlen(writeData));
 						}
 					}
+					buf = "";
 				}
 			}
 		}
