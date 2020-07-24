@@ -160,14 +160,17 @@ int main(int argc, char* argv[]) {
 					num_fd--;
 				} else if(strncmp(buf, ":u", 2) == 0) {
 					char user_name[255];
-					printf("%d: Client User Name%s\n", connect_d, buf);
+					strncpy(user_name, buf + 3, 252);
+					printf("%d: Client User Name: %s\n", connect_d, user_name);
 					memset(buf, '\0', sizeof(buf));
-					substr(user_name, buf, 3, 252);
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] = connect_d) {
+							printf("aaaaa\n");
 							memset(user_list[user_num], '\0', sizeof(user_list[user_num]));
+							printf("bbbbb\n");
 							strcpy(user_list[user_num], user_name);
+							printf("ccccc\n");
 						}
 					}
 				} else {
@@ -205,13 +208,4 @@ int read_line(int socket, char* buf, int len) {
 		return c;
 	}
 	return len - slen;
-}
-
-int substr(char* t, const char* s, int pos, int len) {
-	if(pos < 0 || len < 0 || len > strlen(s))
-		return -1;
-	for(s += pos; *s != '\0' && len > 0; len--)
-		*t++ = *s++;
-	*t = '\0';
-	return 0;
 }
