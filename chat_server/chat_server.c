@@ -111,9 +111,10 @@ int main(int argc, char* argv[]) {
 					free(user_buf);
 
 					/* 新しいユーザを登録 */
-					fd_list[num_fd] = connect_d;
-					memset(user_buf, '\0', sizeof(user_buf));
-					strcpy(user_buf[num_fd], "Anonymous");
+					fd_list[num_fd]	  = connect_d;
+					user_list[num_fd] = (char*)malloc(sizeof(char) * 255);
+					memset(user_list[num_fd], '\0', sizeof(user_list));
+					strcpy(user_list[num_fd], "Anonymous");
 				}
 				num_fd++;
 				printf("\n");
