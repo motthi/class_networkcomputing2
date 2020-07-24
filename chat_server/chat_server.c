@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 	unsigned int address_size = sizeof(client_addr);
 	int epfd, listener_d;
 	int num_fd = 0;
+	int yes	   = 1;
 	int* fd_list;			 //接続しているユーザのソケット番号
 	char** user_list;		 //接続しているユーザの名前
 
@@ -31,6 +32,8 @@ int main(int argc, char* argv[]) {
 	name.sin_family		 = AF_INET;
 	name.sin_port		 = htons(22629);
 	name.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	setsockopt(lister_d, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		   //TIME_WAIT状態でも再起動可能に設定
 	if(bind(listener_d, (struct sockaddr*)&name, sizeof(name)) == -1) {
 		error("bind err");
 	}
