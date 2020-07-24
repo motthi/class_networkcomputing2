@@ -87,10 +87,10 @@ int main(int argc, char* argv[]) {
 					/* データのコピー */
 					int* fd_buf		= (int*)malloc(sizeof(int) * num_fd);
 					char** user_buf = (char**)malloc(sizeof(char) * num_fd);
-					for(int user_num = 0; user_num <= num_fd; user_num++) {
+					for(int user_num = 0; user_num <= num_fd - 1; user_num++) {
 						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
 						memcpy(user_buf[user_num], user_list[user_num], sizeof(user_list[user_num]));
-						free(user_buf[user_num]);
+						free(user_list[user_num]);
 					}
 					memcpy(fd_buf, fd_list, sizeof(fd_buf));
 					free(fd_list);
