@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
 					/* 切断するクライアント以外をコピー */
 					int* fd_buf		= (int*)malloc(sizeof(int) * num_fd - 1);
 					char** user_buf = (char**)malloc(sizeof(char) * num_fd - 1);
-					for(int user_num = 0; user_num <= num_fd; user_num++) {
+					for(int user_num = 0; user_num <= num_fd - 1; user_num++) {
 						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
 					}
 					int fd_buf_num = 0;
