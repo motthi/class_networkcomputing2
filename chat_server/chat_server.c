@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 				if(num_fd == 0) {
 					fd_list		 = (int*)malloc(sizeof(int));
 					user_list	 = (char**)malloc(sizeof(char));
-					user_list[0] = (char*)malloc(sizeof(char * 255));
+					user_list[0] = (char*)malloc(sizeof(char) * 255);
 					fd_list[0]	 = connect_d;
 				} else {
 					/* データのコピー */
@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
 					user_list = (char**)malloc(sizeof(char) * (fd_buf_num));
-					for(int user_num = 0; user_num <= fd_buf_fd; user_num++) {
+					for(int user_num = 0; user_num <= fd_buf_num; user_num++) {
 						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
 						memcpy(user_list[user_num], user_buf[user_num], sizeof(user_buf[user_num]));
 						free(user_buf[user_num]);
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] = connect_d) {
-							memcpy(user_list[user_num], '\0', sizeof(user_list[user_num]));
+							memset(user_list[user_num], '\0', sizeof(user_list[user_num]));
 							strcpy(user_list[user_num], user_name);
 						}
 					}
