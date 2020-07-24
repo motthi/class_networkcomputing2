@@ -165,12 +165,9 @@ int main(int argc, char* argv[]) {
 					memset(buf, '\0', sizeof(buf));
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
-						if(fd_list[user_num] = connect_d) {
-							printf("aaaaa\n");
+						if(fd_list[user_num] == connect_d) {
 							memset(user_list[user_num], '\0', sizeof(user_list[user_num]));
-							printf("bbbbb\n");
 							strcpy(user_list[user_num], user_name);
-							printf("ccccc\n");
 						}
 					}
 				} else {
