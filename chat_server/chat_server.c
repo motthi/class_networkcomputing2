@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
 
 					/* user配列の要素を1つ増やし，user_bufからコピーする */
 					user_list = (char**)malloc(sizeof(char) * (num_fd + 1));
-					for(int user_num = 0; user_num <= num_fd; user_num++) {
+					for(int user_num = 0; user_num <= num_fd - 1; user_num++) {
 						user_list[user_num] = (char*)malloc(sizeof(char) * 255);
 						memcpy(user_list[user_num], user_buf[user_num], sizeof(user_buf[user_num]));
 						free(user_buf[user_num]);
@@ -158,11 +158,11 @@ int main(int argc, char* argv[]) {
 					free(user_buf);
 
 					num_fd--;
+					memset(buf, '\0', sizeof(buf));
 				} else if(strncmp(buf, ":u", 2) == 0) {
 					char user_name[255];
 					strncpy(user_name, buf + 3, 252);
 					printf("%d: Client User Name: %s\n", connect_d, user_name);
-					memset(buf, '\0', sizeof(buf));
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] == connect_d) {
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 					}
-					sprintf(writeData, "%s: %s", user_list[user_num], buf);
+					sprintf(writeData, "%s\t: %s", user_list[user_num], buf);
 					printf("%s", writeData);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
