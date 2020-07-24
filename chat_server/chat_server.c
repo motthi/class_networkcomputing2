@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
 					sprintf(writeData, "%d: %s", connect_d, buf);
 					//printf("%s", writeData);
 					for(int num = 0; buf[num] != '\0'; num++) {
-						printf("0x%02X ", num[i]);
+						printf("0x%02X ", buf[num]);
 					}
 					printf("\n");
 					for(int k = 0; k < num_fd; k++) {
