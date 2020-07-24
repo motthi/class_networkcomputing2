@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 	name.sin_port		 = htons(22629);
 	name.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	setsockopt(lister_d, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		   //TIME_WAIT状態でも再起動可能に設定
+	setsockopt(listener_d, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		 //TIME_WAIT状態でも再起動可能に設定
 	if(bind(listener_d, (struct sockaddr*)&name, sizeof(name)) == -1) {
 		error("bind err");
 	}
