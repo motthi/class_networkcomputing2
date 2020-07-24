@@ -20,7 +20,8 @@ int main(int argc, char* argv[]) {
 	unsigned int address_size = sizeof(client_addr);
 	int epfd, listener_d;
 	int num_fd = 0;
-	int* fd_list;
+	int* fd_list;			 //接続しているユーザのソケット番号
+	char** user_list;		 //接続しているユーザの名前
 
 	listener_d = socket(PF_INET, SOCK_STREAM, 0);
 	if(listener_d == -1) {
@@ -77,16 +78,41 @@ int main(int argc, char* argv[]) {
 
 				/* 新しくチャットに入ったクライアントの番号を配列として保存する */
 				if(num_fd == 0) {
-					fd_list	   = (int*)malloc(sizeof(int));
-					fd_list[0] = connect_d;
+					fd_list		 = (int*)malloc(sizeof(int));
+					user_list	 = (char**)malloc(sizeof(char));
+					user_list[0] = (char*)malloc(sizeof(char * 255));
+					fd_list[0]	 = connect_d;
 				} else {
-					int* fd_buf = (int*)malloc(sizeof(int) * num_fd);
+					/* データのコピー */
+					int* fd_buf		= (int*)malloc(sizeof(int) * num_fd);
+					char** user_buf = (char**)malloc(sizeof(char) * num_fd);
+					for(int user_num = 0; user_num <= num_fd; user_num++) {
+						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
+						memcpy(user_buf[user_num], user_list[user_num], sizeof(user_list[user_num]));
+						free(user_buf[user_num]);
+					}
 					memcpy(fd_buf, fd_list, sizeof(fd_buf));
 					free(fd_list);
+					free(user_list);
+
+					/* fd配列の要素を1つ増やし，fd_bufからコピーする */
 					fd_list = (int*)malloc(sizeof(int) * (num_fd + 1));
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
+
+					/* user配列の要素を1つ増やし，user_bufからコピーする */
+					user_list = (char**)malloc(sizeof(char) * (num_fd + 1));
+					for(int user_num = 0; user_num <= num_fd; user_num++) {
+						user_list[user_num] = (char*)malloc(sizeof(char) * 255);
+						memcpy(user_list[user_num], user_buf[user_num], sizeof(user_buf[user_num]));
+						free(user_buf[user_num]);
+					}
+					free(user_buf);
+
+					/* 新しいユーザを登録 */
 					fd_list[num_fd] = connect_d;
+					memset(user_buf, '\0', sizeof(user_buf));
+					strcpy(user_buf[num_fd], "Anonymous");
 				}
 				num_fd++;
 				printf("\n");
@@ -101,23 +127,47 @@ int main(int argc, char* argv[]) {
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
 					/* 切断するクライアント以外をコピー */
-					int* fd_buf	   = (int*)malloc(sizeof(int) * num_fd - 1);
+					int* fd_buf		= (int*)malloc(sizeof(int) * num_fd - 1);
+					char** user_buf = (char**)malloc(sizeof(char) * num_fd - 1);
+					for(int user_num = 0; user_num <= num_fd; user_num++) {
+						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
+					}
 					int fd_buf_num = 0;
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
-							fd_buf[fd_buf_num] = fd_list[k];
+							fd_buf[fd_buf_num]	 = fd_list[k];
+							user_buf[fd_buf_num] = user_list[k];
 							fd_buf_num++;
+							free(user_list[k]);
 						}
 					}
+					free(user_list);
 					free(fd_list);
 
-					/* クライアントのリストを更新 */
+					/* クライアントのfdリストを更新 */
 					fd_list = (int*)malloc(sizeof(int) * (fd_buf_num));
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
+					user_list = (char**)malloc(sizeof(char) * (fd_buf_num));
+					for(int user_num = 0; user_num <= fd_buf_fd; user_num++) {
+						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
+						memcpy(user_list[user_num], user_buf[user_num], sizeof(user_buf[user_num]));
+						free(user_buf[user_num]);
+					}
+					free(user_buf);
+
 					num_fd--;
 				} else if(strncmp(buf, ":u", 2) == 0) {
+					char* user_name[255];
 					printf("%d: Client User Name%s\n", connect_d, buf);
+					memset(buf, '\0', sizeof(buf));
+
+					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
+						if(fd_list[user_num] = connect_d) {
+							memcpy(user_list[user_num], '\0', sizeof(user_list[user_num]));
+							strcpy(user_list[user_num], user_name);
+						}
+					}
 				} else {
 					char writeData[255];
 					sprintf(writeData, "%d: %s", connect_d, buf);
