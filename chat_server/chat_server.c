@@ -172,7 +172,13 @@ int main(int argc, char* argv[]) {
 					}
 				} else {
 					char writeData[255];
-					sprintf(writeData, "%d: %s", connect_d, buf);
+					int user_num = 0;
+					for(user_num = 0; user_num <= num_fd; user_num++) {
+						if(fd_list[user_num] == connect_d) {
+							break;
+						}
+					}
+					sprintf(writeData, "%s: %s", user_list[user_num], buf);
 					printf("%s", writeData);
 					for(int k = 0; k < num_fd; k++) {
 						if(fd_list[k] != connect_d) {
