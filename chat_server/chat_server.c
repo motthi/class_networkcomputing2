@@ -116,6 +116,8 @@ int main(int argc, char* argv[]) {
 					memcpy(fd_list, fd_buf, sizeof(fd_buf));
 					free(fd_buf);
 					num_fd--;
+				} else if(strncmp(buf, ":u", 2) == 0) {
+					printf("%d: Client User Name%s\n", connect_d, buf);
 				} else {
 					char writeData[255];
 					sprintf(writeData, "%d: %s", connect_d, buf);
