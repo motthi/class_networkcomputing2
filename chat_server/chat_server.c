@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
 					char user_name[255];
 					printf("%d: Client User Name%s\n", connect_d, buf);
 					memset(buf, '\0', sizeof(buf));
-					substr(user_name, buf, 3, int 252);
+					substr(user_name, buf, 3, 252);
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] = connect_d) {
