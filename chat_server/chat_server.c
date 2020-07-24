@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
 					free(fd_buf);
 					user_list = (char**)malloc(sizeof(char) * (fd_buf_num));
 					for(int user_num = 0; user_num <= fd_buf_num; user_num++) {
-						user_buf[user_num] = (char*)malloc(sizeof(char) * 255);
+						user_list[user_num] = (char*)malloc(sizeof(char) * 255);
 						memcpy(user_list[user_num], user_buf[user_num], sizeof(user_buf[user_num]));
 						free(user_buf[user_num]);
 					}
