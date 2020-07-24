@@ -11,6 +11,7 @@ const int MAX_EVENTS = 10;
 
 void error(char* msg);
 int read_line(int socket, char* buf, int len);
+int substr(char* t, const char* s, int pos, int len);
 
 int main(int argc, char* argv[]) {
 	struct sockaddr_in name;
@@ -161,6 +162,7 @@ int main(int argc, char* argv[]) {
 					char* user_name[255];
 					printf("%d: Client User Name%s\n", connect_d, buf);
 					memset(buf, '\0', sizeof(buf));
+					substr(user_name, buf, 3, int 252);
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] = connect_d) {
@@ -203,4 +205,13 @@ int read_line(int socket, char* buf, int len) {
 		return c;
 	}
 	return len - slen;
+}
+
+int substr(char* t, const char* s, int pos, int len) {
+	if(pos < 0 || len < 0 || len > strlen(s))
+		return -1;
+	for(s += pos; *s != '\0' && len > 0; len--)
+		*t++ = *s++;
+	*t = '\0';
+	return 0;
 }
