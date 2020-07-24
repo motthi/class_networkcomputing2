@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
 
 					num_fd--;
 				} else if(strncmp(buf, ":u", 2) == 0) {
-					char* user_name[255];
+					char user_name[255];
 					printf("%d: Client User Name%s\n", connect_d, buf);
 					memset(buf, '\0', sizeof(buf));
 					substr(user_name, buf, 3, int 252);
