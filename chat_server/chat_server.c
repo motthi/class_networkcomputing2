@@ -119,7 +119,6 @@ int main(int argc, char* argv[]) {
 				} else {
 					char writeData[255];
 					sprintf(writeData, "%d: %s", connect_d, buf);
-					//printf("%s", writeData);
 					for(int num = 0; buf[num] != '\0'; num++) {
 						printf("0x%02X ", buf[num]);
 					}
@@ -129,7 +128,7 @@ int main(int argc, char* argv[]) {
 							write(fd_list[k], writeData, strlen(writeData));
 						}
 					}
-					strcpy(buf, "");
+					memset(buf, '\0', sizeof(buf));
 				}
 			}
 		}
