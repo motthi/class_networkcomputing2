@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					/* クライアントを切断する */
-					printf("%d: Client Closed\n", connect_d);
+					printf("%s\t: Client Closed\n", connect_d);
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
 				} else if(strncmp(buf, ":u", 2) == 0) {
 					char user_name[255];
 					strncpy(user_name, buf + 3, 252);
-					printf("%d: Client User Name: %s\n", connect_d, user_name);
+					printf("%d\t: Client User Name: %s\n", connect_d, user_name);
 
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] == connect_d) {
@@ -174,20 +174,28 @@ int main(int argc, char* argv[]) {
 							strcpy(user_list[user_num], user_name);
 						}
 					}
-					memset(buf, "\0", sizeof(buf));
+					memset(buf, '\0', sizeof(buf));
 				} else {
 					char writeData[255];
 					int user_num = 0;
+
+					/* クライアントを確認 */
 					for(user_num = 0; user_num <= num_fd; user_num++) {
 						if(fd_list[user_num] == connect_d) {
 							break;
 						}
 					}
-					sprintf(writeData, "%s\t: %s", user_list[user_num], buf);
-					printf("%s", writeData);
-					for(int k = 0; k < num_fd; k++) {
-						if(fd_list[k] != connect_d) {
-							write(fd_list[k], writeData, strlen(writeData));
+
+					/* 時々改行だけが入る，最初が改行の場合は無視 */
+					if((int)buf[0] == 0x0A) {
+						sprintf(writeData, "%s\t: %s", user_list[user_num], buf);
+						printf("%s", writeData);
+
+						/* 他のクライアントに送信 */
+						for(int k = 0; k < num_fd; k++) {
+							if(fd_list[k] != connect_d) {
+								write(fd_list[k], writeData, strlen(writeData));
+							}
 						}
 					}
 					memset(buf, '\0', sizeof(buf));
