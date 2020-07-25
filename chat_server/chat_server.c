@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 					}
 
 					/* 時々改行だけが入る，最初が改行の場合は無視 */
-					if((int)buf[0] == 0x0A) {
+					if((int)buf[0] != 0x0A) {
 						sprintf(writeData, "%s\t: %s", user_list[user_num], buf);
 						printf("%s", writeData);
 
