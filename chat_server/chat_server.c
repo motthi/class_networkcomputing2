@@ -9,10 +9,6 @@
 
 const int MAX_EVENTS = 10;
 
-void error(char* msg);
-int read_line(int socket, char* buf, int len);
-int substr(char* t, const char* s, int pos, int len);
-
 int main(int argc, char* argv[]) {
 	struct sockaddr_in name;
 	struct sockaddr_storage client_addr;
@@ -25,26 +21,29 @@ int main(int argc, char* argv[]) {
 	int* fd_list;			 //接続しているユーザのソケット番号
 	char** user_list;		 //接続しているユーザの名前
 
+	/* サーバーの設定 */
 	listener_d = socket(PF_INET, SOCK_STREAM, 0);
 	if(listener_d == -1) {
-		error("socket err");
+		perror("socket");
+		return -1;
 	}
 	name.sin_family		 = AF_INET;
 	name.sin_port		 = htons(22629);
 	name.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	setsockopt(listener_d, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));		 //TIME_WAIT状態でも再起動可能に設定
+	setsockopt(listener_d, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));
 	if(bind(listener_d, (struct sockaddr*)&name, sizeof(name)) == -1) {
-		error("bind err");
+		perror("bind");
+		return -1;
 	}
-
 	if(listen(listener_d, 1) == -1) {
-		error("listen err");
+		perror("listen");
+		return -1;
 	}
 
 	// epollファイルディスクリプタをオープン
 	if((epfd = epoll_create(100)) < 0) {
-		error("epoll_create err");
+		perror("epoll_create");
+		return -1;
 	}
 
 	// listener_dソケットをepollの監視対象とする
@@ -52,7 +51,8 @@ int main(int argc, char* argv[]) {
 	ev.events  = EPOLLIN;
 	ev.data.fd = listener_d;
 	if((epoll_ctl(epfd, EPOLL_CTL_ADD, listener_d, &ev)) < 0) {
-		error("epoll_ctl error");
+		perror("epoll_ctl");
+		return -1;
 	}
 
 	printf("Ready ...\n");
@@ -60,15 +60,16 @@ int main(int argc, char* argv[]) {
 		int fd_count = epoll_wait(epfd, events, MAX_EVENTS, -1);
 		char buf[255];
 
-		// 準備ができたディスクリプタを順番に処理
+		/* 準備ができたディスクリプタを順番に処理 */
 		int i;
 		for(i = 0; i < fd_count; i++) {
-			if(events[i].data.fd == listener_d) {
+			if(events[i].data.fd == listener_d) {		 //新しいクライアントがサーバーに接続した場合
 				int connect_d = accept(listener_d, (struct sockaddr*)&client_addr, &address_size);
 				if(connect_d == -1) {
-					error("accept err");
+					perror("accept");
 				}
 
+				/* Welcomeメッセージをクライアントに送信 */
 				printf("%d\t: Client Connected", connect_d);
 				char* msg = "Welcome!\r\n";
 				write(connect_d, msg, strlen(msg));
@@ -77,16 +78,16 @@ int main(int argc, char* argv[]) {
 				ev.events  = EPOLLIN;
 				ev.data.fd = connect_d;
 				if((epoll_ctl(epfd, EPOLL_CTL_ADD, connect_d, &ev)) < 0) {
-					error("epoll_ctl error");
+					perror("epoll_ctl");
 				}
 
 				/* 新しくチャットに入ったクライアントの番号を配列として保存する */
-				if(num_fd == 0) {
+				if(num_fd == 0) {		 //チャットに初めてクライアントがアクセスした場合
 					fd_list		 = (int*)malloc(sizeof(int));
 					user_list	 = (char**)malloc(sizeof(char));
 					user_list[0] = (char*)malloc(sizeof(char) * 255);
 					fd_list[0]	 = connect_d;
-				} else {
+				} else {		//すでにクライアントがいる場合
 					/* データのコピー */
 					int* fd_buf		= (int*)malloc(sizeof(int) * num_fd);
 					char** user_buf = (char**)malloc(sizeof(char) * num_fd);
@@ -163,11 +164,12 @@ int main(int argc, char* argv[]) {
 
 					num_fd--;
 					memset(buf, '\0', sizeof(buf));
-				} else if(strncmp(buf, ":u", 2) == 0) {
+				} else if(strncmp(buf, ":u", 2) == 0) {		   //クライアントのユーザー名を登録
 					char user_name[255];
 					strncpy(user_name, buf + 3, 252);
 					printf("%d\t: Client User Name: %s\n", connect_d, user_name);
 
+					/* 該当するクライアントの配列要素を検索し，ユーザー名を更新 */
 					for(int user_num = 0; user_num <= sizeof(fd_list); user_num++) {
 						if(fd_list[user_num] == connect_d) {
 							memset(user_list[user_num], '\0', sizeof(user_list[user_num]));
@@ -204,24 +206,4 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	return 0;
-}
-
-void error(char* msg) {
-	fprintf(stderr, "%s:%s\n", msg, strerror(errno));
-	exit(1);
-}
-
-int read_line(int socket, char* buf, int len) {
-	char* s	 = buf;
-	int slen = len;
-	int c	 = read(socket, s, slen);
-	while((c > 0) && (s[c - 1] != '\n')) {
-		s += c;
-		slen = -c;
-		c	 = read(socket, s, slen);
-	}
-	if(c < 0) {
-		return c;
-	}
-	return len - slen;
 }
