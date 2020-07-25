@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 					error("accept err");
 				}
 
-				printf("%d: Client Connected", connect_d);
+				printf("%d\t: Client Connected", connect_d);
 				char* msg = "Welcome!\r\n";
 				write(connect_d, msg, strlen(msg));
 
