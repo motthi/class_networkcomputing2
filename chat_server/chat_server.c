@@ -174,6 +174,7 @@ int main(int argc, char* argv[]) {
 							strcpy(user_list[user_num], user_name);
 						}
 					}
+					memset(buf, "\0", sizeof(buf));
 				} else {
 					char writeData[255];
 					int user_num = 0;
