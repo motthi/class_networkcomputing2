@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
 				if(strncmp(buf, ":q", 2) == 0) {		//終了コマンド
 					/* クライアントを切断する */
-					printf("%s\t: Client Closed\n", connect_d);
+					printf("%d\t: Client Closed\n", connect_d);
 					close(connect_d);
 					epoll_ctl(epfd, EPOLL_CTL_DEL, connect_d, &ev);
 
